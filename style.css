@@ -1,0 +1,159 @@
+/* ひっさんノート — スタイル
+   CSP で style-src 'self' を指定しているため、HTML の style 属性は使えない。
+   見た目の指定はすべてこのファイルのクラスで行う。 */
+
+html,body{margin:0;padding:0;background:#E7EFF3}
+body{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+noscript{display:block;padding:24px;font-family:sans-serif;color:#22343D;line-height:1.7}
+.hn *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+.hn{
+  --cell:46px;
+  --paper:#F2F7FA; --grid:#CFE2EC;
+  --ink:#22343D; --ink2:#5E7686;
+  --red:#D93A2B; --redbg:#FBE7E3;
+  --teal:#0F7566; --tealbg:#DBEEE9;
+  --wood:#B0763D;
+  --maru:"Hiragino Maru Gothic ProN","ヒラギノ丸ゴ ProN W4","M PLUS Rounded 1c","Yu Gothic Medium","游ゴシック Medium",Meiryo,sans-serif;
+  font-family:var(--maru);color:var(--ink);background:#E7EFF3;
+  min-height:100vh;padding-bottom:10px;font-variant-numeric:tabular-nums;
+}
+@media(min-width:480px){ .hn{--cell:54px} }
+
+.wrap{max-width:560px;margin:0 auto;padding:0 12px}
+
+/* そろばんの珠＝進みぐあい */
+.rodwrap{position:relative;padding:15px 4px 11px}
+.rod{position:absolute;left:8px;right:8px;top:50%;height:3px;background:#C3D0D7;border-radius:2px}
+.beads{position:relative;display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.bead{width:14px;height:18px;border-radius:7px/9px;border:2px solid var(--wood);background:transparent;
+  transition:background .25s,transform .25s,border-color .25s}
+.bead.done{background:var(--wood)}
+.bead.miss{border-color:var(--red);background:var(--redbg)}
+.bead.now{transform:scale(1.3);border-color:var(--teal)}
+
+/* 方眼紙 */
+.paper{
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(to right,var(--grid) 1px,transparent 1px),
+    linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);
+  border:1px solid #B9CFDC;border-radius:10px;
+  padding:0 var(--cell) var(--cell) 0;
+  box-shadow:0 2px 8px rgba(30,60,80,.07);
+  overflow-x:auto;overflow-y:hidden;
+}
+.grow{display:flex;height:var(--cell);align-items:center;width:max-content}
+.cell{width:var(--cell);height:var(--cell);flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:calc(var(--cell)*.6);line-height:1;font-weight:600;position:relative}
+.op{color:var(--ink2)}
+.rule{box-shadow:inset 0 2.5px 0 var(--ink)}
+.mark{position:absolute;top:1px;left:0;right:0;text-align:center;font-size:calc(var(--cell)*.29);
+  color:var(--red);font-weight:700;animation:pop .22s ease-out}
+.struck{text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px;color:#93A6B2}
+@keyframes pop{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.ul{box-shadow:inset 0 -2.5px 0 var(--ink)}
+
+.box{width:var(--cell);height:var(--cell);flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:calc(var(--cell)*.6);font-weight:700;background:#fff;border:2px dashed #9FBCCB;border-radius:6px;
+  cursor:pointer;color:var(--ink)}
+.box.on{border-style:solid;border-color:var(--teal);box-shadow:0 0 0 3px var(--tealbg)}
+.box.bad{border-style:solid;border-color:var(--red);background:var(--redbg)}
+.box.good{border-style:solid;border-color:var(--teal);background:var(--tealbg)}
+.box:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+
+.box.work{background:transparent;border:1px dotted #A5C1D0;border-radius:4px;font-weight:600}
+.box.work.on{border:2px solid var(--teal);background:#fff}
+.box.work.good{border:2px solid var(--teal);background:var(--tealbg)}
+.box.work.bad{border:2px solid var(--red);background:var(--redbg)}
+.cell.rv{color:var(--teal)}
+.dcol{width:calc(var(--cell)*2);flex:none;height:var(--cell);display:flex;align-items:center;justify-content:flex-end;
+  padding-right:9px;font-size:calc(var(--cell)*.6);font-weight:600}
+.bracket{box-shadow:inset 2.5px 0 0 var(--ink),inset 0 2.5px 0 var(--ink);border-top-left-radius:7px}
+
+.mini{--cell:34px;margin:2px 0 10px}
+.mini .box{border:none;background:transparent}
+.remmini{font-size:14px;color:var(--ink2);margin:0 0 10px}
+.remmini b{font-size:17px;color:var(--teal);margin-left:6px}
+.remrow{display:flex;align-items:center;gap:10px;margin-top:10px;padding:0 2px}
+.remrow span{font-size:17px;font-weight:700}
+
+/* ボタン */
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:12px}
+.key{height:54px;border-radius:11px;border:1px solid #B7CAD5;background:#fff;color:var(--ink);
+  font-family:var(--maru);font-size:23px;font-weight:700;cursor:pointer}
+.key:active{background:#EAF2F6;transform:translateY(1px)}
+.key.util{font-size:15px;color:var(--ink2);background:#F5F9FB}
+
+.btn{display:block;width:100%;padding:15px;border-radius:12px;border:none;cursor:pointer;
+  font-family:var(--maru);font-size:18px;font-weight:700;margin-top:10px}
+.btn.main{background:var(--teal);color:#fff}
+.btn.ghost{background:#fff;color:var(--teal);border:2px solid var(--teal)}
+.btn.quiet{background:#fff;color:var(--ink2);border:1px solid #C3D3DC;font-size:15px;padding:12px}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* パネル */
+.panel{background:#fff;border:1px solid #C9DAE3;border-radius:12px;padding:14px;margin-top:12px}
+.panel h3{margin:0 0 9px;font-size:16px}
+.chip{display:block;width:100%;text-align:left;background:#F4F9FB;border:1px solid #C9DAE3;border-radius:10px;
+  padding:12px 13px;margin-bottom:7px;font-family:var(--maru);font-size:15px;color:var(--ink);cursor:pointer}
+.chip.sel{background:var(--tealbg);border-color:var(--teal);font-weight:700}
+.hintbody{background:var(--tealbg);border-left:4px solid var(--teal);border-radius:0 8px 8px 0;
+  padding:11px 13px;margin:-2px 0 9px}
+.hintbody p{margin:0 0 5px;font-size:15px;line-height:1.65}
+.hintbody p:last-child{margin:0}
+
+.verdict{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:700;margin-top:13px}
+.mk{width:36px;height:36px;flex:none;position:relative}
+.mk.o{border-radius:50%;border:4px solid var(--red)}
+.mk.x:before,.mk.x:after{content:"";position:absolute;top:16px;left:0;width:36px;height:4px;background:var(--red);border-radius:2px}
+.mk.x:before{transform:rotate(45deg)}
+.mk.x:after{transform:rotate(-45deg)}
+
+.note{font-size:14px;color:var(--ink2);line-height:1.65;margin-top:7px}
+.warn{color:var(--red);font-weight:700}
+.steptext p{margin:0 0 6px;font-size:15.5px;line-height:1.7}
+.steptext p:last-child{margin:0}
+.stepnav{display:flex;align-items:center;gap:8px;margin-top:11px}
+.stepnav button{flex:1;padding:11px;border-radius:10px;border:1px solid #C3D3DC;background:#fff;
+  font-family:var(--maru);font-size:15px;font-weight:700;color:var(--teal);cursor:pointer}
+.stepnav button:disabled{opacity:.35;color:var(--ink2)}
+.stepnum{font-size:13px;color:var(--ink2);min-width:54px;text-align:center}
+
+/* セットアップ・結果 */
+.head{padding:20px 4px 4px}
+.head h1{margin:0;font-size:24px;letter-spacing:.05em}
+.head p{margin:5px 0 0;font-size:14px;color:var(--ink2);line-height:1.6}
+.sec{font-size:13px;color:var(--ink2);margin:17px 0 7px;letter-spacing:.08em}
+.opts{display:grid;gap:7px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts.three{grid-template-columns:repeat(3,1fr)}
+.opt{padding:13px 8px;border-radius:11px;border:1.5px solid #C3D3DC;background:#fff;color:var(--ink);
+  font-family:var(--maru);font-size:15px;font-weight:600;cursor:pointer;text-align:center}
+.opt.sel{background:var(--teal);border-color:var(--teal);color:#fff}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 4px 0;font-size:14px;color:var(--ink2)}
+.link{background:none;border:none;color:var(--ink2);font-family:var(--maru);font-size:14px;cursor:pointer;text-decoration:underline}
+.tally{display:flex;gap:10px;margin:12px 0 2px}
+.tallybox{flex:1;background:#fff;border:1px solid #C9DAE3;border-radius:12px;padding:15px;text-align:center}
+.tallybox b{display:block;font-size:31px;line-height:1.2}
+.tallybox span{font-size:13px;color:var(--ink2)}
+.missrow{display:flex;align-items:center;padding:10px 2px;border-bottom:1px solid #E4EDF1;font-size:17px}
+.missrow small{color:var(--ink2);font-size:13px;margin-left:auto}
+
+@media(prefers-reduced-motion:reduce){.hn *{transition:none!important;animation:none!important}}
+
+/* ---- 以前インライン style だったもの ---- */
+.bracket{display:flex}
+.dcol.ghost{visibility:hidden}
+.key.wide{grid-column:span 3}
+.box.rem{width:auto;min-width:78px;padding:0 14px}
+.hintbody p.here{margin-top:8px;font-weight:700}
+.tallybox b.ok{color:var(--red)}
+.btn.mt{margin-top:13px}
+.btn.start{margin-top:18px}
+.note.center{text-align:center;padding-bottom:10px}
+
+/* ---- スマホ・タブレット ---- */
+/* iOS Safari で、同じ場所を素早く2回押したときに画面が拡大されるのを止める。
+   2本指での拡大はそのまま使える。 */
+.hn button,.hn .box{touch-action:manipulation}

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  Content-Security-Policy
+  - スクリプトとスタイルは、このサイト自身のファイル（app.js / style.css）だけを許可する
+  - 画像は、このサイト自身のファイル（ホーム画面用アイコン）と data: URI のみ
+  - 通信（connect-src）は一切許可しない
+  - GitHub Pages はレスポンスヘッダを設定できないため <meta> で指定している
+    （frame-ancestors は <meta> では効かないため書いていない）
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>ひっさんノート — ひき算・わり算の筆算ドリル</title>
+<meta name="description" content="小学生向けの、ひき算とわり算の筆算をマス目に書いて練習するドリル。通信も保存も一切しません。">
+<meta name="theme-color" content="#E7EFF3">
+<meta name="color-scheme" content="light">
+<!-- iOS でホーム画面に追加したときの名前とアイコン -->
+<meta name="apple-mobile-web-app-title" content="ひっさんノート">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23F2F7FA'/%3E%3Cpath d='M8 24h48M8 40h48M24 8v48M40 8v48' stroke='%23CFE2EC' stroke-width='3'/%3E%3Cpath d='M14 46h36' stroke='%2322343D' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M18 30h12' stroke='%230F7566' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<div id="root" class="hn"></div>
+<noscript>このドリルは JavaScript で動きます。ブラウザの JavaScript を有効にしてください。</noscript>
+</body>
+</html>
