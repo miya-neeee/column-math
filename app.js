@@ -53,38 +53,38 @@
     return { type: "sub", a: 302, b: 148 };
   }
 
-  const DIVCONF = {
-    d1: { dv: [2, 9], nd: [10, 99] },
-    d2: { dv: [2, 9], nd: [100, 999] },
+  // 割られる数のけた数ごとの範囲
+  const DIV_ND = { n2: [10, 99], n3: [100, 999], n4: [1000, 9999] };
+  // 割る数のけた数ごとの範囲と、組み合わせられる割られる数のけた数
+  // （2けた÷2けたは商が1けたになりがちで単純すぎるため、割る数が2けたのときは割られる数を3〜4けたに限る）
+  const DIV_DV = {
+    one: { range: [2, 9], nd: ["n2", "n3", "n4"] },
+    two: { range: [10, 99], nd: ["n3", "n4"] },
   };
 
-  function genDivCore(c, forceZero) {
+  function genDivCore(dvRange, ndRange, forceZero) {
     for (let t = 0; t < 900; t++) {
-      const d = ri(c.dv[0], c.dv[1]);
-      if (d < 2) continue;
+      const d = ri(dvRange[0], dvRange[1]);
       if (forceZero) {
-        const qlo = Math.max(10, Math.ceil(Math.ceil(c.nd[0] / d) / 10) * 10);
-        const qhi = Math.floor(Math.floor(c.nd[1] / d) / 10) * 10;
+        const qlo = Math.max(10, Math.ceil(Math.ceil(ndRange[0] / d) / 10) * 10);
+        const qhi = Math.floor(Math.floor(ndRange[1] / d) / 10) * 10;
         if (qhi < qlo) continue;
         const n = d * (ri(qlo / 10, qhi / 10) * 10) + ri(1, d - 1);
-        if (n < c.nd[0] || n > c.nd[1]) continue;
+        if (n < ndRange[0] || n > ndRange[1]) continue;
         return { type: "div", a: n, b: d };
       }
-      const n = ri(c.nd[0], c.nd[1]);
+      const n = ri(ndRange[0], ndRange[1]);
       if (n < d) continue;
       return { type: "div", a: n, b: d };
     }
     return { type: "div", a: 145, b: 12 };
   }
 
-  function genDiv(level) {
-    if (level === "d0") return genDivCore(DIVCONF[["d1", "d2"][ri(0, 1)]], true);
-    if (level === "dm") {
-      if (Math.random() < 0.25) return genDiv("d0");
-      return genDivCore(DIVCONF[["d1", "d2"][ri(0, 1)]], false);
-    }
-    if (Math.random() < 0.2) return genDivCore(DIVCONF[level], true);
-    return genDivCore(DIVCONF[level], false);
+  function genDiv(dvKey) {
+    const nds = DIV_DV[dvKey].nd;
+    const ndRange = DIV_ND[nds[ri(0, nds.length - 1)]];
+    const forceZero = Math.random() < 0.25;
+    return genDivCore(DIV_DV[dvKey].range, ndRange, forceZero);
   }
 
   /* ---------- 筆算の手順 ---------- */
@@ -297,7 +297,7 @@
 
   const state = {
     screen: "setup",                                  // setup / practice / result
-    cfg: { kind: "mix", work: true, count: 10 },
+    cfg: { kind: "mix", work: true, divisor: "one", count: 10 },
     problems: [],
     log: [],                                          // 問題ごとの正誤（true / false）
 
@@ -332,7 +332,7 @@
     const out = [];
     for (let i = 0; i < state.cfg.count; i++) {
       const kind = state.cfg.kind === "mix" ? (Math.random() < 0.5 ? "sub" : "div") : state.cfg.kind;
-      out.push(kind === "sub" ? genSub("sm") : genDiv("dm"));
+      out.push(kind === "sub" ? genSub("sm") : genDiv(state.cfg.divisor));
     }
     return out;
   }
@@ -787,6 +787,7 @@
   }
 
   function viewSetup() {
+    const showDivisor = state.cfg.kind !== "sub";
     return h("div", { class: "wrap" },
       h("div", { class: "head" },
         h("h1", null, "ひっさんノート"),
@@ -795,6 +796,8 @@
       options("three", [["sub", "ひき算"], ["div", "わり算"], ["mix", "りょうほう"]], "kind"),
       h("div", { class: "sec" }, "わり算のとちゅうの式"),
       options("two", [[true, "自分で書く"], [false, "書かない"]], "work"),
+      showDivisor ? h("div", { class: "sec" }, "わり算のわる数") : null,
+      showDivisor ? options("two", [["one", "1けた"], ["two", "2けた"]], "divisor") : null,
       h("div", { class: "sec" }, "なんもん？"),
       options("three", [[5, "5もん"], [10, "10もん"], [20, "20もん"]], "count"),
       h("button", { class: "btn main start", type: "button", onclick: function () { start(); } }, "はじめる"),
