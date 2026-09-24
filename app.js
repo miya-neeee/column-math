@@ -31,8 +31,8 @@
     return false;
   }
 
-  function genSub(level) {
-    const lv = level === "sm" ? ["s1", "s2", "s3", "s4"][ri(0, 3)] : level;
+  function genSub(digits) {
+    const lv = digits === "two" ? "s1" : ["s2", "s3", "s4"][ri(0, 2)];
     for (let t = 0; t < 800; t++) {
       let a, b;
       if (lv === "s1") { a = ri(21, 99); b = ri(11, 98); }
@@ -50,7 +50,7 @@
       if (!hasBorrow(a, b)) continue;
       return { type: "sub", a, b };
     }
-    return { type: "sub", a: 302, b: 148 };
+    return digits === "two" ? { type: "sub", a: 62, b: 27 } : { type: "sub", a: 302, b: 148 };
   }
 
   // 割られる数のけた数ごとの範囲
@@ -297,7 +297,7 @@
 
   const state = {
     screen: "setup",                                  // setup / practice / result
-    cfg: { kind: "mix", work: true, divisor: "one", count: 10 },
+    cfg: { kind: "mix", divisor: "one", digits: "two", count: 10 },
     problems: [],
     log: [],                                          // 問題ごとの正誤（true / false）
 
@@ -332,7 +332,7 @@
     const out = [];
     for (let i = 0; i < state.cfg.count; i++) {
       const kind = state.cfg.kind === "mix" ? (Math.random() < 0.5 ? "sub" : "div") : state.cfg.kind;
-      out.push(kind === "sub" ? genSub("sm") : genDiv(state.cfg.divisor));
+      out.push(kind === "sub" ? genSub(state.cfg.digits) : genDiv(state.cfg.divisor));
     }
     return out;
   }
@@ -381,11 +381,9 @@
   // わり算で ◀ ▶ を押したときにたどる順番
   function order() {
     const o = state.boxes.map(function (_, i) { return "q" + i; });
-    if (state.cfg.work) {
-      state.work.forEach(function (row, r) {
-        row.forEach(function (_, c) { o.push("w" + r + "_" + c); });
-      });
-    }
+    state.work.forEach(function (row, r) {
+      row.forEach(function (_, c) { o.push("w" + r + "_" + c); });
+    });
     o.push("rem");
     return o;
   }
@@ -410,7 +408,7 @@
     } else {
       const i = Number(String(f).slice(1));
       state.boxes[i] = ch;                            // 商は左から右へ
-      state.focus = i < state.boxes.length - 1 ? "q" + (i + 1) : (state.cfg.work ? "w0_0" : "rem");
+      state.focus = i < state.boxes.length - 1 ? "q" + (i + 1) : "w0_0";
     }
     render();
   }
@@ -481,7 +479,7 @@
       v = {
         ok: rq.ok && remOk, why: rq.why, lead: rq.lead,
         qOk: rq.ok, remOk: remOk,
-        work: state.cfg.work ? checkWork(D, state.work) : null,
+        work: checkWork(D, state.work),
         kind: "div",
       };
     }
@@ -634,7 +632,7 @@
         h("div", { class: "grow" },
           h("div", { class: "dcol" }, D.d),
           h("div", { class: "bracket" }, D.nd.map(function (d) { return h("div", { class: "cell" }, d); }))),
-        state.cfg.work ? state.work.map(function (row, r) {
+        state.work.map(function (row, r) {
           return h("div", { class: "grow" },
             h("div", { class: "dcol ghost" }, D.d),
             row.map(function (val, c) {
@@ -646,7 +644,7 @@
               }
               return box(val, cls, "とちゅうの式", function () { setFocus("w" + r + "_" + c); });
             }));
-        }) : null),
+        })),
       h("div", { class: "remrow" },
         h("span", null, "あまり"),
         box(state.rem,
@@ -788,14 +786,15 @@
 
   function viewSetup() {
     const showDivisor = state.cfg.kind !== "sub";
+    const showDigits = state.cfg.kind !== "div";
     return h("div", { class: "wrap" },
       h("div", { class: "head" },
         h("h1", null, "ひっさんノート"),
-        h("p", null, "けた数はまぜて出ます。マス目にそのまま書いて練習。")),
+        h("p", null, "マス目にそのまま書いて練習。")),
       h("div", { class: "sec" }, "なにをやる？"),
       options("three", [["sub", "ひき算"], ["div", "わり算"], ["mix", "りょうほう"]], "kind"),
-      h("div", { class: "sec" }, "わり算のとちゅうの式"),
-      options("two", [[true, "自分で書く"], [false, "書かない"]], "work"),
+      showDigits ? h("div", { class: "sec" }, "ひき算のけた数") : null,
+      showDigits ? options("two", [["two", "2けた"], ["three", "3けた"]], "digits") : null,
       showDivisor ? h("div", { class: "sec" }, "わり算のわる数") : null,
       showDivisor ? options("two", [["one", "1けた"], ["two", "2けた"]], "divisor") : null,
       h("div", { class: "sec" }, "なんもん？"),
